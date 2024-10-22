@@ -7,8 +7,32 @@
     <title>anonymous-guinea-pig</title>
     <link rel="stylesheet" href="style.css">
     <script>
-    window.dataLayer = window.dataLayer || [];
-    </script>
+      window.dataLayer = window.dataLayer || [];
+
+      function gtag() {
+          dataLayer.push(arguments);
+      }
+
+      if (localStorage.getItem('consentMode') === null) {
+          gtag('consent', 'default', {
+              'ad_storage': 'denied',
+              'ad_user_data': 'denied',
+              'ad_personalization': 'denied',
+              'analytics_storage': 'denied',
+              'personalization_storage': 'denied',
+              'functionality_storage': 'denied',
+              'security_storage': 'denied',
+          });
+      } else {
+          gtag('consent', 'default', JSON.parse(localStorage.getItem('consentMode')));
+      }
+
+      if (localStorage.getItem('userId') != null) {
+          window.dataLayer.push({
+              'user_id': localStorage.getItem('userId')
+          });
+      }
+  </script>
     <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -24,30 +48,70 @@
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PC8C45K"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
-    <a href="#" onclick="dataLayer.push({
-      event: 'view_item_list',
-        ecommerce: {
-            items: [{
-              item_name: 'Finnish magical parka',
-              item_id: 'fi01',
-              price: '31.00',
-              item_brand: 'agp',
-              item_category: 'Apparel',
-              item_list_name: 'Featured items',
-              index: 1,
-              quantity: '1'
-            },{
-              item_name: 'Swedish regular parka',
-              item_id: 'fi02',
-              price: '92.00',
-              item_brand: 'agp',
-              item_category: 'Apparel',
-              item_list_name: 'Featured items',
-              index: 2,
-              quantity: '1'
-            }]
-    }
-    });">View featured items</a>
-    <a href="tel:+123456789">123456789</a>
+    <div id="cookie-consent-banner" class="cookie-consent-banner">
+      <h3>Cookie settings</h3>
+      <p>We use cookies to provide you with the best possible experience. They also allow us to analyze user behavior in order to constantly improve the website for you.</p>
+      <button id="btn-accept-all" class="cookie-consent-button btn-success">Accept All</button>
+      <button id="btn-accept-some" class="cookie-consent-button btn-outline">Accept Selection</button>
+      <button id="btn-reject-all" class="cookie-consent-button btn-grayscale">Reject All</button>
+      <div class="cookie-consent-options">
+          <label><input id="consent-necessary" type="checkbox" value="Necessary" checked disabled>Necessary</label>
+          <label><input id="consent-analytics" type="checkbox" value="Analytics" checked>Analytics</label>
+          <label><input id="consent-preferences" type="checkbox" value="Preferences" checked>Preferences</label>
+          <label><input id="consent-marketing" type="checkbox" value="Marketing">Marketing</label>
+      </div>
+  </div>
+  
+  <script>
+      function hideBanner() {
+          document.getElementById('cookie-consent-banner').style.display = 'none';
+      }
+  
+      if (localStorage.getItem('consentMode') === null) {
+  
+          document.getElementById('btn-accept-all').addEventListener('click', function() {
+              setConsent({
+                  necessary: true,
+                  analytics: true,
+                  preferences: true,
+                  marketing: true
+              });
+              hideBanner();
+          });
+          document.getElementById('btn-accept-some').addEventListener('click', function() {
+              setConsent({
+                  necessary: true,
+                  analytics: document.getElementById('consent-analytics').checked,
+                  preferences: document.getElementById('consent-preferences').checked,
+                  marketing: document.getElementById('consent-marketing').checked
+              });
+              hideBanner();
+          });
+          document.getElementById('btn-reject-all').addEventListener('click', function() {
+              setConsent({
+                  necessary: false,
+                  analytics: false,
+                  preferences: false,
+                  marketing: false
+              });
+              hideBanner();
+          });
+          document.getElementById('cookie-consent-banner').style.display = 'block';
+      }
+  
+      function setConsent(consent) {
+          const consentMode = {
+              'functionality_storage': consent.necessary ? 'granted' : 'denied',
+              'security_storage': consent.necessary ? 'granted' : 'denied',
+              'ad_storage': consent.marketing ? 'granted' : 'denied',
+              'ad_user_data': consent.marketing ? 'granted' : 'denied',
+              'ad_personalization': consent.marketing ? 'granted' : 'denied',
+              'analytics_storage': consent.analytics ? 'granted' : 'denied',
+              'personalization_storage': consent.preferences ? 'granted' : 'denied',
+          };
+          gtag('consent', 'update', consentMode);
+          localStorage.setItem('consentMode', JSON.stringify(consentMode));
+      }
+  </script>
 </body>
 </html>
